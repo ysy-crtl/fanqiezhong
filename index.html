@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动态倒计时</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #ffffff;
+            padding: 40px 30px;
+        }
+        .top-text {
+            margin-bottom: 24px;
+        }
+        .title-line {
+            display: flex;
+            align-items: center;
+            font-size: 64px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 16px;
+        }
+        .clock-icon {
+            font-size: 68px;
+            margin-right: 12px;
+        }
+        .desc-text {
+            font-size: 64px;
+            font-weight: 600;
+        }
+        .countdown-wrap {
+            width: 100%;
+            max-width: 1700px;
+            border: 2px solid #eeeeee;
+            border-radius: 20px;
+            padding: 40px 30px;
+        }
+        .time-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            gap: 16px;
+        }
+        .time-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .num-box-wrap {
+            display: flex;
+            align-items: center;
+        }
+        .num-card {
+            width: 110px;
+            height: 140px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 6px #e2e2e2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 90px;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+            margin: 0 4px;
+        }
+        .num-card::after {
+            content: "";
+            position: absolute;
+            width: 80%;
+            height: 2px;
+            background-color: #cacaca;
+        }
+        .colon {
+            font-size: 80px;
+            font-weight: bold;
+            margin: 0 8px;
+            color: #333;
+        }
+        .time-label {
+            margin-top: 16px;
+            font-size: 36px;
+            color: #000;
+        }
+        /* 移动端适配 */
+        @media (max-width: 900px) {
+            .title-line, .desc-text {
+                font-size: 32px;
+            }
+            .num-card {
+                width: 60px;
+                height: 80px;
+                font-size: 48px;
+            }
+            .colon {
+                font-size: 40px;
+            }
+            .time-label {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-text">
+        <div class="title-line">
+            <span class="clock-icon">⏰</span>
+            <span>距离2026年6月29日23分59秒</span>
+        </div>
+        <div class="desc-text">还有：</div>
+    </div>
+
+    <div class="countdown-wrap">
+        <div class="time-row">
+            <!-- 天 -->
+            <div class="time-group">
+                <div class="num-box-wrap">
+                    <div class="num-card" id="day1">0</div>
+                    <div class="num-card" id="day2">0</div>
+                </div>
+                <div class="time-label">天</div>
+            </div>
+            <span class="colon">:</span>
+            <!-- 时 -->
+            <div class="time-group">
+                <div class="num-box-wrap">
+                    <div class="num-card" id="hour1">0</div>
+                    <div class="num-card" id="hour2">0</div>
+                </div>
+                <div class="time-label">时</div>
+            </div>
+            <span class="colon">:</span>
+            <!-- 分 -->
+            <div class="time-group">
+                <div class="num-box-wrap">
+                    <div class="num-card" id="min1">0</div>
+                    <div class="num-card" id="min2">0</div>
+                </div>
+                <div class="time-label">分</div>
+            </div>
+            <span class="colon">:</span>
+            <!-- 秒 -->
+            <div class="time-group">
+                <div class="num-box-wrap">
+                    <div class="num-card" id="sec1">0</div>
+                    <div class="num-card" id="sec2">0</div>
+                </div>
+                <div class="time-label">秒</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 目标时间：2026年6月29日 00:23:59
+        const targetTime = new Date('2026-06-29T00:23:59+08:00').getTime();
+
+        function updateCountdown() {
+            const now = Date.now();
+            let diff = targetTime - now;
+
+            // 时间已过期，全部置0
+            if (diff <= 0) {
+                setTimeNum('day', '00');
+                setTimeNum('hour', '00');
+                setTimeNum('min', '00');
+                setTimeNum('sec', '00');
+                return;
+            }
+
+            // 计算天时分秒
+            const day = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hour = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const min = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const sec = Math.floor((diff % (1000 * 60)) / 1000);
+
+            // 补零成两位数字
+            setTimeNum('day', String(day).padStart(2, '0'));
+            setTimeNum('hour', String(hour).padStart(2, '0'));
+            setTimeNum('min', String(min).padStart(2, '0'));
+            setTimeNum('sec', String(sec).padStart(2, '0'));
+        }
+
+        // 给两位数字卡片分别赋值
+        function setTimeNum(type, twoNum) {
+            document.getElementById(type + '1').innerText = twoNum[0];
+            document.getElementById(type + '2').innerText = twoNum[1];
+        }
+
+        // 首次执行 + 每秒刷新
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
